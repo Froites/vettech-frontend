@@ -7,9 +7,7 @@ import PetsPage from './pages/pets/PetsPage';
 import CreatePetPage from './pages/pets/CreatePetPage';
 import EditPetPage from './pages/pets/EditPetPage';
 import AppointmentsPage from './pages/appointments/AppointmentsPage';
-
-
-// Import pages
+import CreateAppointmentPage from './pages/appointments/CreateAppointmentPage';
 
 
 const router = createBrowserRouter([
@@ -62,6 +60,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <AppointmentsPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/appointments/new',
+    element: (
+      <ProtectedRoute roles={['TUTOR']}>
+        <CreateAppointmentPage />
       </ProtectedRoute>
     ),
   },

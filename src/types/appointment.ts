@@ -3,26 +3,51 @@ import type { Pet } from "./pet";
 
 export interface Appointment {
   id: string;
-  petId: string;
-  pet?: Pet;
-  veterinarianId: string;
-  veterinarian?: User;
-  tutorId: string;
-  tutor?: User;
-  date: string;
-  time: string;
-  reason: string;
-  status: 'scheduled' | 'confirmed' | 'completed' | 'cancelled';
+  scheduledAt: string;
+  duration: number;
+  type: 'ROUTINE' | 'EMERGENCY' | 'FOLLOW_UP';
+  status: 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
   notes?: string;
+  meetingUrl?: string;
+  recordingUrl?: string;
+  price: string; // Sua API retorna como string
   createdAt: string;
   updatedAt: string;
+  petId: string;
+  tutorId: string;
+  veterinarianId: string;
+  pet?: Pet;
+  tutor?: User;
+  veterinarian?: User;
+  medicalRecord?: any;
+  prescription?: any;
 }
 
 export interface CreateAppointmentRequest {
   petId: string;
   veterinarianId: string;
-  date: string;
-  time: string;
-  reason: string;
+  scheduledAt: string; // ISO string
+  type: 'ROUTINE' | 'EMERGENCY' | 'FOLLOW_UP';
   notes?: string;
+}
+
+export interface VeterinarianAvailability {
+  id: string;
+  email: string;
+  role: string;
+  profile: {
+    firstName: string;
+    lastName: string;
+  };
+  veterinarianProfile?: {
+    crmv: string;
+    specialties: string[];
+    consultationFee: number;
+    isAvailable: boolean;
+  };
+}
+
+export interface TimeSlot {
+  time: string;
+  available: boolean;
 }
