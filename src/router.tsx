@@ -6,9 +6,14 @@ import DashboardPage from './pages/dashboard/DashboardPage';
 import PetsPage from './pages/pets/PetsPage';
 import CreatePetPage from './pages/pets/CreatePetPage';
 import EditPetPage from './pages/pets/EditPetPage';
+import PetMedicalHistoryPage from './pages/pets/PetMedicalHistoryPage';
 import AppointmentsPage from './pages/appointments/AppointmentsPage';
 import CreateAppointmentPage from './pages/appointments/CreateAppointmentPage';
-
+import MedicalRecordsPage from './pages/medical-records/MedicalRecordsPage';
+import CreateRecordPage from './pages/medical-records/CreateRecordPage';
+import PrescriptionsPage from './pages/prescriptions/PrescriptionsPage';
+import CreatePrescriptionPage from './pages/prescriptions/CreatePrescriptionPage';
+import PrescriptionDetailsPage from './pages/prescriptions/PrescriptionDetailsPage';
 
 const router = createBrowserRouter([
   {
@@ -56,6 +61,14 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: '/pets/:id/medical-history',
+    element: (
+      <ProtectedRoute>
+        <PetMedicalHistoryPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: '/appointments',
     element: (
       <ProtectedRoute>
@@ -68,6 +81,46 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute roles={['TUTOR']}>
         <CreateAppointmentPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/medical-records',
+    element: (
+      <ProtectedRoute>
+        <MedicalRecordsPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/medical-records/new',
+    element: (
+      <ProtectedRoute roles={['VETERINARIAN']}>
+        <CreateRecordPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/prescriptions',
+    element: (
+      <ProtectedRoute>
+        <PrescriptionsPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/prescriptions/new',
+    element: (
+      <ProtectedRoute roles={['VETERINARIAN']}>
+        <CreatePrescriptionPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/prescriptions/:id',
+    element: (
+      <ProtectedRoute>
+        <PrescriptionDetailsPage />
       </ProtectedRoute>
     ),
   },

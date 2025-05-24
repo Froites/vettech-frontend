@@ -299,10 +299,12 @@ const PetsPage = () => {
                         <Calendar className="h-4 w-4 mr-1" />
                         Agendar
                       </button>
-                      <button className="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
-                        <FileText className="h-4 w-4 mr-1" />
-                        Histórico
-                      </button>
+                      <Link to={`/pets/${pet.id}/medical-history`}>
+                        <button className="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
+                          <FileText className="h-4 w-4 mr-1" />
+                          Histórico
+                        </button>
+                      </Link>
                     </div>
 
                     {isTutor && (
