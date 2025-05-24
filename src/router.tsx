@@ -9,6 +9,7 @@ import EditPetPage from './pages/pets/EditPetPage';
 import PetMedicalHistoryPage from './pages/pets/PetMedicalHistoryPage';
 import AppointmentsPage from './pages/appointments/AppointmentsPage';
 import CreateAppointmentPage from './pages/appointments/CreateAppointmentPage';
+import VetAvailabilityPage from './pages/appointments/VetAvailabilityPage';
 import MedicalRecordsPage from './pages/medical-records/MedicalRecordsPage';
 import CreateRecordPage from './pages/medical-records/CreateRecordPage';
 import PrescriptionsPage from './pages/prescriptions/PrescriptionsPage';
@@ -81,6 +82,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute roles={['TUTOR']}>
         <CreateAppointmentPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/appointments/availability',
+    element: (
+      <ProtectedRoute roles={['VETERINARIAN']}>
+        <VetAvailabilityPage />
       </ProtectedRoute>
     ),
   },
