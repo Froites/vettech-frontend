@@ -1,9 +1,8 @@
-// src/components/layouts/ListPageLayout.tsx
 import React, { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-
 import { Search, Filter, Plus } from 'lucide-react';
 import { Layout } from '../layout/Layout';
+import Button from '../ui/Button';
 
 interface StatCard {
   icon: React.ElementType;
@@ -25,26 +24,17 @@ interface CreateButton {
 }
 
 interface ListPageLayoutProps {
-  // Header
   title: string;
   description: string;
   createButton?: CreateButton;
-  
-  // Stats (opcional)
   stats?: StatCard[];
-  
-  // Search & Filters
   searchValue: string;
   onSearchChange: (value: string) => void;
   searchPlaceholder?: string;
   filters?: FilterOption[];
   activeFilters?: Record<string, string>;
   onFilterChange?: (key: string, value: string) => void;
-  
-  // Content
   children: ReactNode;
-  
-  // Loading & Empty states
   isLoading?: boolean;
   isEmpty?: boolean;
   emptyState?: {
@@ -56,8 +46,6 @@ interface ListPageLayoutProps {
       onClick: () => void;
     };
   };
-  
-  // Debug (opcional)
   debugInfo?: string;
 }
 
@@ -89,7 +77,6 @@ export const ListPageLayout: React.FC<ListPageLayoutProps> = ({
   emptyState,
   debugInfo
 }) => {
-  // Loading skeleton
   const LoadingSkeleton = () => (
     <div className="space-y-4">
       {[1, 2, 3, 4].map((i) => (
@@ -109,7 +96,6 @@ export const ListPageLayout: React.FC<ListPageLayoutProps> = ({
     </div>
   );
 
-  // Empty state
   const EmptyState = () => {
     if (!emptyState) return null;
     
@@ -121,13 +107,14 @@ export const ListPageLayout: React.FC<ListPageLayoutProps> = ({
         <h3 className="text-lg font-medium text-gray-900 mb-2">{emptyTitle}</h3>
         <p className="text-gray-600 mb-6">{emptyDesc}</p>
         {action && (
-          <button 
+          <Button 
+            variant="primary"
+            size="lg"
+            icon={Plus}
             onClick={action.onClick}
-            className="btn btn-primary btn-lg"
           >
-            <Plus className="h-5 w-5 mr-2" />
             {action.text}
-          </button>
+          </Button>
         )}
       </div>
     );
@@ -136,7 +123,6 @@ export const ListPageLayout: React.FC<ListPageLayoutProps> = ({
   return (
     <Layout>
       <div className="space-y-6">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
@@ -145,15 +131,13 @@ export const ListPageLayout: React.FC<ListPageLayoutProps> = ({
           
           {createButton && createButton.show !== false && (
             <Link to={createButton.href}>
-              <button className="btn btn-primary btn-md">
-                <Plus className="h-4 w-4 mr-2" />
+              <Button variant="primary" icon={Plus}>
                 {createButton.text}
-              </button>
+              </Button>
             </Link>
           )}
         </div>
 
-        {/* Debug Info */}
         {debugInfo && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-sm text-blue-800">
@@ -162,7 +146,6 @@ export const ListPageLayout: React.FC<ListPageLayoutProps> = ({
           </div>
         )}
 
-        {/* Stats Cards */}
         {stats && stats.length > 0 && (
           <div className={`grid grid-cols-1 md:grid-cols-${Math.min(stats.length, 4)} gap-6`}>
             {stats.map((stat, index) => {
@@ -184,10 +167,8 @@ export const ListPageLayout: React.FC<ListPageLayoutProps> = ({
           </div>
         )}
 
-        {/* Search & Filters */}
         <div className="bg-white border border-gray-200 rounded-lg p-4">
           <div className="flex flex-col sm:flex-row gap-4">
-            {/* Search */}
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
@@ -199,7 +180,6 @@ export const ListPageLayout: React.FC<ListPageLayoutProps> = ({
               />
             </div>
             
-            {/* Filters */}
             {filters && filters.length > 0 && (
               <div className="flex items-center space-x-2">
                 <Filter className="h-4 w-4 text-gray-600" />
@@ -223,7 +203,6 @@ export const ListPageLayout: React.FC<ListPageLayoutProps> = ({
           </div>
         </div>
 
-        {/* Content */}
         {isLoading ? (
           <LoadingSkeleton />
         ) : isEmpty ? (

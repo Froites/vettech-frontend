@@ -12,7 +12,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { toast } from 'react-hot-toast';
 import api from '../../services/api';
 import { format, addDays } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { is, ptBR } from 'date-fns/locale';
 
 const appointmentSchema = z.object({
   petId: z.string().min(1, 'Selecione um pet'),
@@ -32,11 +32,12 @@ interface VeterinarianAvailability {
     lastName?: string;
   };
   veterinarianProfile?: {
+    id: string;
     crmv?: string;
     specialties?: string[];
     consultationFee?: number;
-    isAvailable?: boolean;
   };
+  isAvailable?: boolean;
 }
 
 const CreateAppointmentPage = () => {
@@ -107,30 +108,21 @@ const CreateAppointmentPage = () => {
       
       // Filtrar e validar cada veterinário
       const validVets = vetsData
-        .filter((vet: any) => vet && vet.id) // Remover entradas inválidas
+        .filter((vet: any) => vet && vet.id)
         .map((vet: any) => ({
-          id: vet.id,
-          email: vet.email || 'email@exemplo.com',
+          id: vet.userId, // <- Aqui está a correção principal!
+          email: vet.user?.email || 'email@exemplo.com',
           profile: {
-            firstName: vet.profile?.firstName || 'Nome',
-            lastName: vet.profile?.lastName || 'Não Informado',
+            firstName: vet.user?.profile?.firstName || 'Nome',
+            lastName: vet.user?.profile?.lastName || 'Não Informado',
           },
-          veterinarianProfile: vet.veterinarianProfile ? {
-            crmv: vet.veterinarianProfile.crmv || 'Não informado',
-            specialties: Array.isArray(vet.veterinarianProfile.specialties) 
-              ? vet.veterinarianProfile.specialties 
-              : ['Clínica Geral'],
-            consultationFee: Number(vet.veterinarianProfile.consultationFee) || 150,
-            isAvailable: Boolean(vet.veterinarianProfile.isAvailable)
-          } : {
-            crmv: 'Não informado',
-            specialties: ['Clínica Geral'],
-            consultationFee: 150,
-            isAvailable: false
+          veterinarianProfile: {
+            crmv: vet.crmv || 'Não informado',
+            specialties: Array.isArray(vet.specialties) ? vet.specialties : ['Clínica Geral'],
+            consultationFee: Number(vet.consultationFee) || 150,
+            isAvailable: Boolean(vet.isAvailable)
           }
-        }));
-        
-      console.log('📋 Veterinários processados:', validVets);
+        }))              
       setVeterinarians(validVets);
       
       if (validVets.length === 0) {
@@ -334,7 +326,8 @@ const CreateAppointmentPage = () => {
               const crmv = vet?.veterinarianProfile?.crmv || 'Não informado';
               const specialties = vet?.veterinarianProfile?.specialties || ['Clínica Geral'];
               const consultationFee = vet?.veterinarianProfile?.consultationFee || 0;
-              const isAvailable = vet?.veterinarianProfile?.isAvailable !== false;
+              const isAvailable = vet?.isAvailable !== false;
+              console.log("Teste disponibilidade", isAvailable)
 
               return (
                 <label

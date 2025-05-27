@@ -1,12 +1,18 @@
-// src/pages/pets/CreatePetPage.tsx - VERSÃO REFATORADA
+// src/pages/pets/CreatePetPage.tsx - ATUALIZADA COM DESIGN SYSTEM
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Heart, X } from 'lucide-react';
+
 import { CreatePageLayout } from '../../components/layouts/CreatePageLayout';
 import { FormSection } from '../../components/forms/FormSection';
+import Button from '../../components/ui/Button';
+import { PetSpeciesRadioGroup } from '../../components/ui/RadioGroup';
+import Select from '../../components/ui/Select';
+import Input from '../../components/ui/Input';
+
 import { useAuthStore } from '../../stores/authStore';
 import { usePets } from '../../hooks/usePets';
 
@@ -56,12 +62,10 @@ const CreatePetPage = () => {
     }
   }, [user, navigate]);
 
-  const speciesOptions = [
-    { value: 'DOG', label: 'Cão', emoji: '🐕' },
-    { value: 'CAT', label: 'Gato', emoji: '🐱' },
-    { value: 'BIRD', label: 'Ave', emoji: '🐦' },
-    { value: 'RABBIT', label: 'Coelho', emoji: '🐰' },
-    { value: 'OTHER', label: 'Outro', emoji: '🐾' },
+  // 🎛️ Opções para selects
+  const genderOptions = [
+    { value: 'Macho', label: 'Macho' },
+    { value: 'Fêmea', label: 'Fêmea' },
   ];
 
   const addAllergy = () => {
@@ -102,28 +106,31 @@ const CreatePetPage = () => {
   // Loading se não tem usuário ou não é tutor
   if (!user || user.role !== 'TUTOR') {
     return (
-      <CreatePageLayout
-        title="Verificando permissões..."
-        onBack={() => navigate('/pets')}
-        onSubmit={() => {}}
-      >
-        <div className="flex justify-center items-center min-h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Verificando permissões...</p>
-          </div>
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Verificando permissões...</p>
         </div>
-      </CreatePageLayout>
+      </div>
     );
   }
 
   // Summary para mostrar no final
   const formValues = watch();
+  const selectedSpecies = formValues.species;
+  const speciesLabel = selectedSpecies ? {
+    'DOG': 'Cão',
+    'CAT': 'Gato', 
+    'BIRD': 'Ave',
+    'RABBIT': 'Coelho',
+    'OTHER': 'Outro'
+  }[selectedSpecies] : '--';
+
   const summary = {
     title: 'Resumo do Pet:',
     items: [
       { label: 'Nome', value: formValues.name || '--' },
-      { label: 'Espécie', value: formValues.species ? speciesOptions.find(s => s.value === formValues.species)?.label || formValues.species : '--' },
+      { label: 'Espécie', value: speciesLabel },
       { label: 'Raça', value: formValues.breed || '--' },
       { label: 'Sexo', value: formValues.gender || '--' },
       { label: 'Alergias', value: allergies.length > 0 ? allergies.join(', ') : 'Nenhuma' },
@@ -145,118 +152,64 @@ const CreatePetPage = () => {
       debugInfo={`User: ${user.profile?.firstName || user.email} | Role: ${user.role}`}
       summary={formValues.name ? summary : undefined}
     >
-      {/* Informações Básicas */}
+      {/* 🆕 Informações Básicas com novos componentes */}
       <FormSection title="Informações Básicas" icon={Heart}>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Nome do Pet *
-          </label>
-          <input
-            {...register('name')}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 ${
-              errors.name ? 'border-red-500' : 'border-gray-300'
-            }`}
-            placeholder="Ex: Rex, Mimi, Pipoca..."
-          />
-          {errors.name && (
-            <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-          )}
-        </div>
+        <Input
+          label="Nome do Pet"
+          placeholder="Ex: Rex, Mimi, Pipoca..."
+          error={errors.name?.message}
+          required
+          {...register('name')}
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Espécie *
-          </label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {speciesOptions.map((option) => (
-              <label
-                key={option.value}
-                className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-              >
-                <input
-                  type="radio"
-                  value={option.value}
-                  {...register('species')}
-                  className="sr-only"
-                />
-                <div className="flex items-center space-x-2">
-                  <span className="text-2xl">{option.emoji}</span>
-                  <span className="text-sm font-medium">{option.label}</span>
-                </div>
-              </label>
-            ))}
-          </div>
-          {errors.species && (
-            <p className="mt-1 text-sm text-red-600">{errors.species.message}</p>
-          )}
+        <PetSpeciesRadioGroup
+          value={formValues.species}
+          onChange={(value) => setValue('species', value as any)}
+          name="species"
+          error={errors.species?.message}
+          required
+        />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input
+            label="Raça"
+            placeholder="Ex: Golden Retriever"
+            {...register('breed')}
+          />
+
+          <Select
+            label="Sexo"
+            options={genderOptions}
+            value={formValues.gender}
+            onChange={(value) => setValue('gender', value)}
+            placeholder="Selecionar..."
+          />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Raça
-            </label>
-            <input
-              {...register('breed')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-              placeholder="Ex: Golden Retriever"
-            />
-          </div>
+          <Input
+            type="date"
+            label="Data de Nascimento"
+            {...register('dateOfBirth')}
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Sexo
-            </label>
-            <select
-              {...register('gender')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="">Selecionar...</option>
-              <option value="Macho">Macho</option>
-              <option value="Fêmea">Fêmea</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Data de Nascimento
-            </label>
-            <input
-              type="date"
-              {...register('dateOfBirth')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Peso (kg)
-            </label>
-            <input
-              type="number"
-              step="0.1"
-              {...register('weight')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-              placeholder="Ex: 5.5"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Cor
-          </label>
-          <input
-            {...register('color')}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-            placeholder="Ex: Dourado, Preto e branco..."
+          <Input
+            type="number"
+            step="0.1"
+            label="Peso (kg)"
+            placeholder="Ex: 5.5"
+            error={errors.weight?.message}
+            {...register('weight')}
           />
         </div>
+
+        <Input
+          label="Cor"
+          placeholder="Ex: Dourado, Preto e branco..."
+          {...register('color')}
+        />
       </FormSection>
 
-      {/* Informações de Saúde */}
       <FormSection title="Informações de Saúde" description="Dados importantes para o veterinário">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -264,11 +217,9 @@ const CreatePetPage = () => {
           </label>
           <div className="space-y-3">
             <div className="flex space-x-2">
-              <input
-                type="text"
+              <Input
                 value={newAllergy}
                 onChange={(e) => setNewAllergy(e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                 placeholder="Ex: Frango, Leite..."
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -276,30 +227,34 @@ const CreatePetPage = () => {
                     addAllergy();
                   }
                 }}
+                className="flex-1"
               />
-              <button
+              
+              <Button
                 type="button"
+                variant="outline"
                 onClick={addAllergy}
-                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
               >
                 Adicionar
-              </button>
+              </Button>
             </div>
+            
             {allergies.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {allergies.map((allergy, index) => (
                   <span
                     key={index}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-red-100 text-red-800"
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-error-100 text-error-800"
                   >
                     {allergy}
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="sm"
+                      icon={X}
                       onClick={() => removeAllergy(allergy)}
-                      className="ml-2 hover:text-red-900"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
+                      className="ml-2 text-error-800 hover:text-error-900"
+                    />
                   </span>
                 ))}
               </div>

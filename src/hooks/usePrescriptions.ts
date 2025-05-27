@@ -15,7 +15,7 @@ export const usePrescriptions = () => {
 
   // Minhas receitas (para veterinários)
   const myPrescriptionsQuery = useQuery({
-    queryKey: ['prescriptions', 'my-prescriptions'],
+    queryKey: ['prescriptions', 'active'],
     queryFn: prescriptionsService.getMyPrescriptions,
   });
 

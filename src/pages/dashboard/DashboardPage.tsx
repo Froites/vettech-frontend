@@ -1,4 +1,3 @@
-// src/pages/dashboard/DashboardPage.tsx - ATUALIZADO
 import { Link } from 'react-router-dom';
 import { 
   Heart, 
@@ -12,6 +11,9 @@ import {
   XCircle
 } from 'lucide-react';
 import { Layout } from '../../components/layout/Layout';
+import StatsCard from '../../components/ui/StatsCard';
+import QuickActionCard from '../../components/ui/QuickActionCard';
+import Button from '../../components/ui/Button';
 import { useAuthStore } from '../../stores/authStore';
 import { usePets } from '../../hooks/usePets';
 import { useState, useEffect } from 'react';
@@ -26,7 +28,6 @@ const DashboardPage = () => {
   const isTutor = user?.role === 'TUTOR';
   const isVet = user?.role === 'VETERINARIAN';
 
-  // Carregar status de disponibilidade do vet
   useEffect(() => {
     if (isVet) {
       loadVetAvailability();
@@ -39,7 +40,7 @@ const DashboardPage = () => {
       const response = await api.get('/users/veterinarian-profile');
       setVetAvailability(response.data.isAvailable || false);
     } catch (error) {
-      setVetAvailability(false); // Assume indisponível se não tem perfil
+      setVetAvailability(false);
     } finally {
       setLoadingAvailability(false);
     }
@@ -48,7 +49,6 @@ const DashboardPage = () => {
   return (
     <Layout>
       <div className="space-y-6">
-        {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
             Olá, {user?.profile?.firstName || 'Usuário'}! 👋
@@ -61,215 +61,159 @@ const DashboardPage = () => {
           </p>
         </div>
 
-        {/* Quick Actions para Veterinários */}
         {isVet && (
           <div className="bg-white shadow rounded-lg p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Ações Rápidas</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Status de Disponibilidade */}
               <Link to="/appointments/availability">
-                <div className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 ${
-                    vetAvailability ? 'bg-success-100' : 'bg-gray-200'
-                  }`}>
-                    {loadingAvailability ? (
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-600"></div>
-                    ) : vetAvailability ? (
-                      <CheckCircle className="h-6 w-6 text-success-600" />
-                    ) : (
-                      <XCircle className="h-6 w-6 text-gray-600" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Disponibilidade</p>
-                    <p className="text-xs text-gray-500">
-                      {loadingAvailability ? 'Carregando...' : 
-                       vetAvailability ? 'Disponível' : 'Indisponível'}
-                    </p>
-                  </div>
-                </div>
+                <QuickActionCard
+                  icon={vetAvailability ? CheckCircle : XCircle}
+                  title="Disponibilidade"
+                  subtitle={loadingAvailability ? 'Carregando...' : 
+                           vetAvailability ? 'Disponível' : 'Indisponível'}
+                />
               </Link>
 
-              {/* Outras ações rápidas */}
               <Link to="/appointments">
-                <div className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <Calendar className="h-10 w-10 text-primary-600 mr-3" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Consultas</p>
-                    <p className="text-xs text-gray-500">Ver agenda</p>
-                  </div>
-                </div>
+                <QuickActionCard
+                  icon={Calendar}
+                  title="Consultas"
+                  subtitle="Ver agenda"
+                />
               </Link>
 
               <Link to="/medical-records/new">
-                <div className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <FileText className="h-10 w-10 text-success-600 mr-3" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Prontuário</p>
-                    <p className="text-xs text-gray-500">Criar novo</p>
-                  </div>
-                </div>
+                <QuickActionCard
+                  icon={FileText}
+                  title="Prontuário"
+                  subtitle="Criar novo"
+                />
               </Link>
 
               <Link to="/prescriptions/new">
-                <div className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <Pill className="h-10 w-10 text-warning-600 mr-3" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Receita</p>
-                    <p className="text-xs text-gray-500">Prescrever</p>
-                  </div>
-                </div>
+                <QuickActionCard
+                  icon={Pill}
+                  title="Receita"
+                  subtitle="Prescrever"
+                />
               </Link>
             </div>
           </div>
         )}
 
-        {/* Quick Actions para Tutores */}
         {isTutor && (
           <div className="bg-white shadow rounded-lg p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Ações Rápidas</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Link to="/pets/new">
-                <div className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <Plus className="h-10 w-10 text-primary-600 mr-3" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Novo Pet</p>
-                    <p className="text-xs text-gray-500">Cadastrar</p>
-                  </div>
-                </div>
+                <QuickActionCard
+                  icon={Plus}
+                  title="Novo Pet"
+                  subtitle="Cadastrar"
+                />
               </Link>
 
               <Link to="/appointments/new">
-                <div className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <Calendar className="h-10 w-10 text-success-600 mr-3" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Consulta</p>
-                    <p className="text-xs text-gray-500">Agendar</p>
-                  </div>
-                </div>
+                <QuickActionCard
+                  icon={Calendar}
+                  title="Consulta"
+                  subtitle="Agendar"
+                />
               </Link>
 
               <Link to="/pets">
-                <div className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <Heart className="h-10 w-10 text-warning-600 mr-3" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Meus Pets</p>
-                    <p className="text-xs text-gray-500">Gerenciar</p>
-                  </div>
-                </div>
+                <QuickActionCard
+                  icon={Heart}
+                  title="Meus Pets"
+                  subtitle="Gerenciar"
+                />
               </Link>
 
               <Link to="/prescriptions">
-                <div className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <Pill className="h-10 w-10 text-error-600 mr-3" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Receitas</p>
-                    <p className="text-xs text-gray-500">Ver ativas</p>
-                  </div>
-                </div>
+                <QuickActionCard
+                  icon={Pill}
+                  title="Receitas"
+                  subtitle="Ver ativas"
+                />
               </Link>
             </div>
           </div>
         )}
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {isTutor && (
             <>
-              <div className="bg-white shadow rounded-lg p-6">
-                <div className="flex items-center">
-                  <Heart className="h-8 w-8 text-primary-600" />
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-600">Meus Pets</p>
-                    <p className="text-2xl font-bold text-primary-600">{pets.length}</p>
-                  </div>
-                </div>
-              </div>
+              <StatsCard
+                icon={Heart}
+                label="Meus Pets"
+                value={pets.length}
+                color="primary"
+                onClick={() => window.location.href = '/pets'}
+              />
 
-              <div className="bg-white shadow rounded-lg p-6">
-                <div className="flex items-center">
-                  <Calendar className="h-8 w-8 text-success-600" />
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-600">Consultas</p>
-                    <p className="text-2xl font-bold text-success-600">
-                      {pets.reduce((acc, pet) => acc + (pet.appointments?.length || 0), 0)}
-                    </p>
-                  </div>
-                </div>
-              </div>
+              <StatsCard
+                icon={Calendar}
+                label="Consultas"
+                value={pets.reduce((acc, pet) => acc + (pet.appointments?.length || 0), 0)}
+                color="success"
+                onClick={() => window.location.href = '/appointments'}
+              />
 
-              <div className="bg-white shadow rounded-lg p-6">
-                <div className="flex items-center">
-                  <FileText className="h-8 w-8 text-warning-600" />
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-600">Prontuários</p>
-                    <p className="text-2xl font-bold text-warning-600">
-                      {pets.reduce((acc, pet) => acc + (pet.medicalRecords?.length || 0), 0)}
-                    </p>
-                  </div>
-                </div>
-              </div>
+              <StatsCard
+                icon={FileText}
+                label="Prontuários"
+                value={pets.reduce((acc, pet) => acc + (pet.medicalRecords?.length || 0), 0)}
+                color="warning"
+                onClick={() => window.location.href = '/medical-records'}
+              />
 
-              <div className="bg-white shadow rounded-lg p-6">
-                <div className="flex items-center">
-                  <Pill className="h-8 w-8 text-error-600" />
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-600">Receitas Ativas</p>
-                    <p className="text-2xl font-bold text-error-600">3</p>
-                  </div>
-                </div>
-              </div>
+              <StatsCard
+                icon={Pill}
+                label="Receitas Ativas"
+                value={3}
+                color="error"
+                onClick={() => window.location.href = '/prescriptions'}
+              />
             </>
           )}
 
           {isVet && (
             <>
-              <div className="bg-white shadow rounded-lg p-6">
-                <div className="flex items-center">
-                  <Users className="h-8 w-8 text-primary-600" />
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-600">Pacientes</p>
-                    <p className="text-2xl font-bold text-primary-600">12</p>
-                  </div>
-                </div>
-              </div>
+              <StatsCard
+                icon={Users}
+                label="Pacientes"
+                value={12}
+                color="primary"
+              />
 
-              <div className="bg-white shadow rounded-lg p-6">
-                <div className="flex items-center">
-                  <Calendar className="h-8 w-8 text-success-600" />
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-600">Consultas Hoje</p>
-                    <p className="text-2xl font-bold text-success-600">5</p>
-                  </div>
-                </div>
-              </div>
+              <StatsCard
+                icon={Calendar}
+                label="Consultas Hoje"
+                value={5}
+                color="success"
+                onClick={() => window.location.href = '/appointments'}
+              />
 
-              <div className="bg-white shadow rounded-lg p-6">
-                <div className="flex items-center">
-                  <FileText className="h-8 w-8 text-warning-600" />
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-600">Prontuários</p>
-                    <p className="text-2xl font-bold text-warning-600">28</p>
-                  </div>
-                </div>
-              </div>
+              <StatsCard
+                icon={FileText}
+                label="Prontuários"
+                value={28}
+                color="warning"
+                onClick={() => window.location.href = '/medical-records'}
+              />
 
-              <div className="bg-white shadow rounded-lg p-6">
-                <div className="flex items-center">
-                  <Clock className={`h-8 w-8 ${vetAvailability ? 'text-success-600' : 'text-gray-600'}`} />
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-600">Status</p>
-                    <p className={`text-lg font-bold ${vetAvailability ? 'text-success-600' : 'text-gray-600'}`}>
-                      {loadingAvailability ? '...' : vetAvailability ? 'Disponível' : 'Indisponível'}
-                    </p>
-                  </div>
-                </div>
-              </div>
+              <StatsCard
+                icon={Clock}
+                label="Status"
+                value={loadingAvailability ? '...' : vetAvailability ? 'Disponível' : 'Indisponível'}
+                color={vetAvailability ? 'success' : 'gray'}
+                loading={loadingAvailability}
+                onClick={() => window.location.href = '/appointments/availability'}
+              />
             </>
           )}
         </div>
 
-        {/* Recent Activity */}
         <div className="bg-white shadow rounded-lg">
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">Atividade Recente</h2>
@@ -278,12 +222,27 @@ const DashboardPage = () => {
             <div className="text-center py-8">
               <Clock className="mx-auto h-12 w-12 text-gray-400 mb-4" />
               <p className="text-gray-500">Nenhuma atividade recente</p>
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-gray-400 mt-1 mb-4">
                 {isTutor 
                   ? 'Comece cadastrando um pet ou agendando uma consulta'
                   : 'Suas próximas consultas aparecerão aqui'
                 }
               </p>
+              
+              {isTutor && (
+                <div className="flex justify-center space-x-4">
+                  <Link to="/pets/new">
+                    <Button variant="primary" icon={Plus}>
+                      Cadastrar Pet
+                    </Button>
+                  </Link>
+                  <Link to="/appointments/new">
+                    <Button variant="ghost" icon={Calendar}>
+                      Agendar Consulta
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

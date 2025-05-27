@@ -1,4 +1,3 @@
-// src/components/layouts/CreatePageLayout.tsx
 import React, { type ReactNode } from 'react';
 
 import { ArrowLeft, CheckCircle } from 'lucide-react';
@@ -39,6 +38,13 @@ interface CreatePageLayoutProps {
       value: string;
     }>;
   };
+
+  // 🆕 NOVAS PROPS PARA MODO EDIT
+  mode?: 'create' | 'edit';
+  editTitle?: string;
+  editSubmitText?: string;
+  editSuccessTitle?: string;
+  editSuccessDescription?: string;
 }
 
 export const CreatePageLayout: React.FC<CreatePageLayoutProps> = ({
@@ -56,8 +62,38 @@ export const CreatePageLayout: React.FC<CreatePageLayoutProps> = ({
   successTitle = "Criado com sucesso!",
   successDescription = "Redirecionando...",
   debugInfo,
-  summary
+  summary,
+  // 🆕 Novas props
+  mode = 'create',
+  editTitle,
+  editSubmitText,
+  editSuccessTitle,
+  editSuccessDescription
 }) => {
+  // 🆕 Lógica para textos dinâmicos baseados no modo
+  const getTitle = () => {
+    if (mode === 'edit' && editTitle) return editTitle;
+    return title;
+  };
+
+  const getSubmitText = () => {
+    if (mode === 'edit' && editSubmitText) return editSubmitText;
+    if (mode === 'edit') return 'Atualizar';
+    return submitText;
+  };
+
+  const getSuccessTitle = () => {
+    if (mode === 'edit' && editSuccessTitle) return editSuccessTitle;
+    if (mode === 'edit') return 'Atualizado com sucesso!';
+    return successTitle;
+  };
+
+  const getSuccessDescription = () => {
+    if (mode === 'edit' && editSuccessDescription) return editSuccessDescription;
+    if (mode === 'edit') return 'Redirecionando...';
+    return successDescription;
+  };
+
   // Success Screen
   if (showSuccess) {
     return (
@@ -66,10 +102,10 @@ export const CreatePageLayout: React.FC<CreatePageLayoutProps> = ({
           <div className="bg-white shadow rounded-lg p-8 text-center">
             <CheckCircle className="h-16 w-16 text-success-500 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              {successTitle}
+              {getSuccessTitle()}
             </h2>
             <p className="text-gray-600 mb-6">
-              {successDescription}
+              {getSuccessDescription()}
             </p>
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600 mx-auto"></div>
           </div>
@@ -90,7 +126,7 @@ export const CreatePageLayout: React.FC<CreatePageLayoutProps> = ({
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{getTitle()}</h1>
             {description && (
               <p className="text-gray-600">{description}</p>
             )}
@@ -101,7 +137,7 @@ export const CreatePageLayout: React.FC<CreatePageLayoutProps> = ({
         {debugInfo && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-sm text-blue-800">
-              <strong>Debug:</strong> {debugInfo}
+              <strong>Debug:</strong> {debugInfo} | <strong>Mode:</strong> {mode}
             </p>
           </div>
         )}
@@ -145,12 +181,12 @@ export const CreatePageLayout: React.FC<CreatePageLayoutProps> = ({
                 {isSubmitting ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Salvando...
+                    {mode === 'edit' ? 'Atualizando...' : 'Salvando...'}
                   </>
                 ) : (
                   <>
                     {SubmitIcon && <SubmitIcon className="h-4 w-4 mr-2" />}
-                    {submitText}
+                    {getSubmitText()}
                   </>
                 )}
               </button>

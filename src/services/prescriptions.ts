@@ -87,10 +87,10 @@ export const prescriptionsService = {
     return response.data;
   },
 
-  // GET /api/prescriptions/my-prescriptions - Receitas do veterinário
+  // GET /api/prescriptions/active - Receitas do veterinário
   async getMyPrescriptions(): Promise<Prescription[]> {
-    console.log('🔗 Chamando API: GET /prescriptions/my-prescriptions');
-    const response = await api.get('/prescriptions/my-prescriptions');
+    console.log('🔗 Chamando API: GET /prescriptions/active');
+    const response = await api.get('/prescriptions/active');
     console.log('📡 Minhas receitas:', response.data);
     return response.data;
   },
